@@ -15,48 +15,54 @@ function register_qbank_api_routes() {
 }
 
 function save_answer_to_question($request) {
-    $question_id = $request->get_param('question_id');
-    $student_id = $request->get_param('student_id');
 
-    // Assuming the request contains JSON data with 'answer' field
-    $answer_data = $request->get_json_params();
+  $question_id = $request->get_param('question_id');
+  $student_id = $request->get_param('student_id');
 
-    if (empty($answer_data) || !isset($answer_data['answer_index'])) {
-        return rest_ensure_response(array(
-            'error' => 'Invalid data. Please provide an "answer" field in the request.'
-        ));
-    }
+  // Assuming the request contains JSON data with 'answer' field
+  $answer_data = $request->get_json_params();
 
-    $answer_index = (int) $answer_data['answer_index'];
+  if (empty($answer_data) || !isset($answer_data['answer_index'])) {
+    return rest_ensure_response(array(
+      'error' => 'Invalid data. Please provide an "answer" field in the request.'
+    ));
+  }
 
-		// Check if answer is true or false.
-		$is_correct = is_answer_correct($question_id, $answer_index);
-		$correct    = ($is_correct === true) ? 1 : 0;
+  $answer_index = (int) $answer_data['answer_index'];
 
-    // Create an object to pass to the insert_qbank_answer function
-    $answer_object = (object) array(
-      'user'         => $student_id,
-      'question'     => $question_id,
-      'answer_index' => $answer_index,
-			'correct'      => $correct
-    );
+	// Get the correct answer index.
+	$answer_correct_index = answer_correct_index($question_id);
 
-    // Attempt to insert the answer into the database
-    $inserted_id = insert_qbank_answer($answer_object);
+	// Check if answer is true or false.
+	$is_correct = is_answer_correct($question_id, $answer_index);
+	$correct    = ($is_correct === true) ? 1 : 0;
 
-    if ($inserted_id === false) {
-        return rest_ensure_response(array(
-            'error' => 'Error saving the answer.'
-        ));
-    } else {
-      return rest_ensure_response(array(
-        'message' => 'Answer saved successfully',
-        'question_id' => $question_id,
-        'student_id' => $student_id,
-				'answer_correct' => $is_correct,
-        'inserted_id' => $inserted_id
-      ));
-    }
+  // Create an object to pass to the insert_qbank_answer function
+  $answer_object = (object) array(
+    'user'         => $student_id,
+    'question'     => $question_id,
+    'answer_index' => $answer_index,
+		'correct'      => $correct
+  );
+
+  // Attempt to insert the answer into the database
+  $inserted_id = insert_qbank_answer($answer_object);
+
+  if ($inserted_id === false) {
+    return rest_ensure_response(array(
+      'error' => 'Error saving the answer.'
+    ));
+  } else {
+    return rest_ensure_response(array(
+      'message'              => 'Answer saved successfully',
+      'question_id'          => $question_id,
+      'student_id'           => $student_id,
+			'answer_correct'       => $is_correct,
+			'answer_index'         => $answer_index,
+      'inserted_id'          => $inserted_id,
+			'answer_correct_index' => $answer_correct_index
+    ));
+  }
 }
 
 add_action('rest_api_init', 'register_qbank_api_routes');
@@ -108,4 +114,21 @@ function is_answer_correct($question_id, $answer_index) {
   }
 
   return false;
+}
+
+function answer_correct_index($question_id) {
+
+  $answers = get_field('answers', $question_id);
+  if (empty($answers) || !is_array($answers)) {
+    return false;
+  }
+
+  foreach ($answers as $answer_index => $answer) {
+    if (isset($answer['correct']) && $answer['correct']) {
+      return $answer_index;
+    }
+  }
+
+	return false;
+
 }

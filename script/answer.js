@@ -61,6 +61,19 @@ answerButtons.forEach(button => {
 			console.log(lessonContent);
 			lessonTemplate.parentNode.insertBefore(lessonContent, lessonTemplate.nextSibling);
 
+			// Highlight correct answer.
+			const answerList = document.querySelector("ul.qbank-answer-choice-list");
+			const answerItems = answerList.getElementsByTagName("li");
+			answerItems[data.answer_correct_index].classList.remove("qbank-answer-selected");
+			answerItems[data.answer_correct_index].classList.add("qbank-answer-correct");
+
+			// Highlight incorrect answer if provided.
+			if( ! data.answer_correct ) {
+				answerItems[data.answer_index].classList.remove("qbank-answer-selected");
+				answerItems[data.answer_index].classList.add("qbank-answer-incorrect");
+			}
+
+
     })
     .catch(error => {
         console.error('Error:', error);

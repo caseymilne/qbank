@@ -66,6 +66,9 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/quiz-next-button.php' );
 		$widgets_manager->register( new \QBank\QuizNextButton_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz.php' );
+		$widgets_manager->register( new \QBank\Quiz_Widget() );
+
 	}
 
 }

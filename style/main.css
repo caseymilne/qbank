@@ -33,3 +33,11 @@
 	color: rgb(30 41 59);
 	border-right: solid 1px rgb(226 232 240);
 }
+
+.qbank-answer-choice-list .qbank-answer-correct {
+	background-color: rgb(134 239 172);
+}
+
+.qbank-answer-choice-list .qbank-answer-incorrect {
+	background-color: rgb(254 205 211);
+}
