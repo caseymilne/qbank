@@ -15,23 +15,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class AnswerButton_Widget extends \Elementor\Widget_Base {
+class QuizNextButton_Widget extends \Elementor\Widget_Base {
 
-	public function __construct($data = [], $args = null) {
-      parent::__construct($data, $args);
-      wp_register_script( 'qbank-answer', QBANK_URL . '/script/answer.js', [ 'elementor-frontend' ], '1.0.0', true );
-   }
 	/**
 	 * Get widget name.
 	 *
-	 * Retrieve oEmbed widget name.
+	 * Retrieve widget name.
 	 *
 	 * @since 1.0.0
 	 * @access public
 	 * @return string Widget name.
 	 */
 	public function get_name() {
-		return 'answer_button';
+		return 'quiz_next_button';
 	}
 
 	/**
@@ -44,7 +40,7 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 	 * @return string Widget title.
 	 */
 	public function get_title() {
-		return esc_html__( 'Answer Button', 'qbank' );
+		return esc_html__( 'Quiz Next Button', 'qbank' );
 	}
 
 	/**
@@ -96,12 +92,8 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 	 * @return array Widget keywords.
 	 */
 	public function get_keywords() {
-		return [ 'quiz', 'question' ];
+		return [ 'question', 'content' ];
 	}
-
-	public function get_script_depends() {
-  	return [ 'qbank-answer' ];
-   }
 
 	/**
 	 * Register oEmbed widget controls.
@@ -148,7 +140,7 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'default' => '#f00',
 				'selectors' => [
-					'{{WRAPPER}} li' => 'color: {{VALUE}}',
+					'{{WRAPPER}}' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -169,8 +161,8 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 
 		$settings = $this->get_settings_for_display();
 		echo '<div>';
-		echo '<button class="qbank-answer-button">';
-		echo 'Answer';
+		echo '<button class="qbank-quiz-next-button">';
+		echo 'Next';
 		echo '</button>';
 		echo '</div>';
 
