@@ -159,6 +159,7 @@ class QuestionAnswers_Widget extends \Elementor\Widget_Base {
 	 */
 	protected function render() {
 
+		$answer_choice_markers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'L'];
 		$settings = $this->get_settings_for_display();
 		$answers = get_field('answers');
 
@@ -166,19 +167,24 @@ class QuestionAnswers_Widget extends \Elementor\Widget_Base {
 			echo 'No answers founds.';
 		}
 
-		echo '<div>';
+		echo '<ul class="qbank-answer-choice-list">';
 		if( is_array( $answers ) ) {
 			foreach( $answers as $answer_index => $answer_row ) {
 				echo '<li answer-index="'. $answer_index .'" class="qbank-answer-choice">';
+				echo '<div class="qbank-answer-choice-marker">';
+				echo $answer_choice_markers[$answer_index];
+				echo '</div>';
+				echo '<div>';
 				echo $answer_row['text'];
+				echo '</div>';
 				echo '</li>';
 			}
 		};
-		echo '</div>';
+		echo '</ul>';
 
 		echo '<style>';
+		echo '.qbank-answer-choice-list { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; }';
 		echo '.qbank-answer-choice { cursor: pointer; }';
-		echo '.qbank-answer-choice:hover { background-color: #999; }';
 		echo '</style>';
 
 	}

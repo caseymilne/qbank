@@ -167,12 +167,14 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 	 */
 	protected function render() {
 
+		global $post;
 		$settings = $this->get_settings_for_display();
-		echo '<div>';
-		echo '<button class="qbank-answer-button">';
+		echo '<div class="qbank-answer-button-wrap">';
+		echo '<button class="qbank-answer-button" question-id="'.$post->ID.'">';
 		echo 'Answer';
 		echo '</button>';
 		echo '</div>';
+		echo '<div id="qbank-answer-result"><div>';
 
 	}
 

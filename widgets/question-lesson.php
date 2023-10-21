@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class QuestionContent_Widget extends \Elementor\Widget_Base {
+class QuestionLesson_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * Get widget name.
@@ -27,7 +27,7 @@ class QuestionContent_Widget extends \Elementor\Widget_Base {
 	 * @return string Widget name.
 	 */
 	public function get_name() {
-		return 'question_content';
+		return 'question_lesson';
 	}
 
 	/**
@@ -40,7 +40,7 @@ class QuestionContent_Widget extends \Elementor\Widget_Base {
 	 * @return string Widget title.
 	 */
 	public function get_title() {
-		return esc_html__( 'Question Content', 'qbank' );
+		return esc_html__( 'Question Lesson', 'qbank' );
 	}
 
 	/**
@@ -160,14 +160,13 @@ class QuestionContent_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 
 		global $post;
-		$question_text = get_field( 'question_text', $post->ID );
-		if( $question_text === NULL || $question_text == '' ) {
-			$question_text = $post->post_title;
-		}
+		$question_lesson = get_field( 'lesson', $post->ID );
 		$settings = $this->get_settings_for_display();
-		echo '<div class="qbank-question-content">';
-		echo $question_text;
+		echo '<template id="qbank-question-lesson-template">';
+		echo '<div class="qbank-question-lesson">';
+		echo $question_lesson;
 		echo '</div>';
+		echo '</template>';
 
 	}
 

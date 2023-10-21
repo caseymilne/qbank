@@ -1,0 +1,35 @@
+.qbank-question-content {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: rgb(30 41 59);
+}
+
+.qbank-answer-choice {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-radius: 0.5rem;
+	background-color: rgb(241 245 249);
+}
+
+.qbank-answer-choice:hover {
+	background-color: rgb(226 232 240);
+}
+
+.qbank-answer-choice-list .qbank-answer-selected {
+	background-color: rgb(203 213 225);
+}
+
+.qbank-answer-choice-marker {
+	background-color: rgb(203 213 225);
+	padding: 0.5rem 1rem;
+	border-top-left-radius: 0.5rem;
+	border-bottom-left-radius: 0.5rem;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: rgb(30 41 59);
+	border-right: solid 1px rgb(226 232 240);
+}

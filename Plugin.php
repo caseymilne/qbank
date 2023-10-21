@@ -14,14 +14,22 @@ define( 'QBANK_VERSION', '1.1.0' );
 
 class Plugin {
 
- public function __construct() {
+	public function __construct() {
 
-	require_once( QBANK_PATH . '/functions.php' );
-	add_action( 'elementor/widgets/register', [$this, 'register_new_widgets'] );
+		require_once( QBANK_PATH . '/functions.php' );
+		add_action( 'elementor/widgets/register', [$this, 'register_new_widgets'] );
 
+		add_action('wp_enqueue_scripts', function() {
+			wp_enqueue_style(
+				'qbank-main-style',
+				QBANK_URL . '/style/main.css',
+				[],
+				time(),
+				'all'
+			);
+		});
 
-
- }
+	}
 
  /**
 	* Register new Elementor widgets.
@@ -39,6 +47,9 @@ class Plugin {
 
 		require_once( QBANK_PATH . '/widgets/question-content.php' );
 		$widgets_manager->register( new \QBank\QuestionContent_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/question-lesson.php' );
+		$widgets_manager->register( new \QBank\QuestionLesson_Widget() );
 
 		require_once( QBANK_PATH . '/widgets/quiz-start-button.php' );
 		$widgets_manager->register( new \QBank\QuizStartButton_Widget() );
