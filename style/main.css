@@ -52,3 +52,13 @@
 #qbank-answer-choice-list .qbank-answer-incorrect {
 	background-color: rgb(254 205 211);
 }
+
+.qbank-quiz-previous-button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.qbank-quiz-next-button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

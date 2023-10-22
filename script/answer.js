@@ -91,8 +91,10 @@ class QBANK_Answer {
 		})
 		.then(response => response.json())
 		.then(data => {
-			console.log(data.message); // Log the response message
+
 			const answerResultContainer = document.getElementById('qbank-answer-result');
+
+			this.answerResultEvent(data);
 
 			// Show question result.
 			if(data.answer_correct) {
@@ -103,7 +105,8 @@ class QBANK_Answer {
 
 			// Show question lesson.
 			const lessonTemplate = document.getElementById('qbank-question-lesson-template');
-			if(lessonTemplate) {
+			console.log(this.lessonContent)
+			if(lessonTemplate && this.lessonContent !== null) {
 
 				const lessonFragment = lessonTemplate.content.cloneNode(true);
 				const lessonElement  = lessonFragment.querySelector('.qbank-question-lesson');
@@ -116,6 +119,8 @@ class QBANK_Answer {
 			  }
 
 			}
+
+			this.scrollToAnswerResults();
 
 			// Highlight correct answer.
 			const answerList = document.getElementById("qbank-answer-choice-list");
@@ -140,12 +145,34 @@ class QBANK_Answer {
 		});
 	}
 
+	scrollToAnswerResults() {
+		const element = document.getElementById('qbank-answer-result');
+		if (element) {
+		  element.scrollIntoView({ behavior: 'smooth' });
+		}
+	}
+
 	lockQuestion() {
 
 		const answerChoiceList = document.getElementById('qbank-answer-choice-list');
 		answerChoiceList.classList.remove('qbank-answering-enabled');
 		this.removeAnswerChoiceEvents();
 		this.removeAnswerButtonEvents();
+
+	}
+
+	answerResultEvent(data) {
+
+		const eventDetails = {
+		  questionId: 123,
+		  correct: data.answer_correct,
+		};
+
+		const customEvent = new CustomEvent('qbank_question_answer_result', {
+		  detail: eventDetails
+		});
+
+		document.dispatchEvent(customEvent);
 
 	}
 

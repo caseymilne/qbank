@@ -72,6 +72,15 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/quiz.php' );
 		$widgets_manager->register( new \QBank\Quiz_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz-score.php' );
+		$widgets_manager->register( new \QBank\QuizScore_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/quiz-score-incorrect.php' );
+		$widgets_manager->register( new \QBank\QuizScoreIncorrect_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/quiz-score-answers.php' );
+		$widgets_manager->register( new \QBank\QuizScoreAnswers_Widget() );
+
 	}
 
 }

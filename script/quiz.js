@@ -1,9 +1,14 @@
 class Quiz {
 
+	questionData         = null;
+	questionCount        = 0;
+	currentQuestionIndex = false;
+
 	constructor() {
 
 		// Import question data.
 		this.questionData = qbankQuestionData;
+		this.questionCount = this.questionData.length;
 
 		// Show quiz start page.
 		const startTemplate = document.getElementById('qbank-quiz-start-template');
@@ -15,6 +20,66 @@ class Quiz {
 			startButton: document.querySelector('.qbank-quiz-start-button')
 		}
 		this.elements.startButton.addEventListener('click', this.startHandler.bind(this));
+
+		// Init scoring object.
+		this.score = {
+			answerCount: 0,
+			correctCount: 0,
+			incorrectCount: 0
+		}
+
+		// Track scoring on event.
+		document.addEventListener('qbank_question_answer_result', (e) => {
+			console.log(this.score)
+
+			// Update score storage.
+			this.score.answerCount++;
+
+			const correct = e.detail.correct;
+			if(correct) {
+				this.score.correctCount++;
+			}
+			if(!correct) {
+				this.score.incorrectCount++;
+			}
+
+			console.log(this.score)
+
+			// Update score display.
+			this.updateScoreDisplay();
+
+		});
+
+	}
+
+	updateScoreDisplay() {
+
+		// Remove all existing .quiz-score elements displayed.
+		const scoreElementsCurrent = document.querySelectorAll('.quiz-score');
+		if(scoreElementsCurrent.length) {
+			scoreElementsCurrent.forEach((scoreElement) => {
+				scoreElement.remove();
+			});
+		}
+
+		// Insert score widgets into the DOM from templatese.
+		const scoreWidgets = document.querySelectorAll('.quiz-score-template');
+		if(scoreWidgets.length) {
+			scoreWidgets.forEach((scoreWidget) => {
+				const scoreWidgetFragment = document.importNode(scoreWidget.content, true);
+				scoreWidget.parentNode.insertBefore(scoreWidgetFragment, scoreWidget.nextSibling);
+			});
+		}
+
+		// Update the display.
+		const scoreElements = document.querySelectorAll('.quiz-score');
+		if(scoreElements.length) {
+			scoreElements.forEach((scoreElement) => {
+				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-correct}}', this.score.correctCount);
+				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-incorrect}}', this.score.incorrectCount);
+				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-answers}}', this.score.answerCount);
+			});
+		}
 
 	}
 
@@ -29,9 +94,37 @@ class Quiz {
 
 	nextHandler(e) {
 
-		console.log('clicking next...')
-		this.loadQuestion(1)
+		if(this.currentQuestionIndex === parseInt(this.questionCount - 1)) {
+			console.error('Trying to handle a next click when current question is the last question available.');
+			return;
+		}
 
+		const newQuestionIndex = parseInt(this.currentQuestionIndex +1);
+		this.loadQuestion(newQuestionIndex)
+
+	}
+
+	nextButtonDisable() {
+		this.elements = {
+			nextButtons: document.querySelectorAll('.qbank-quiz-next-button')
+		}
+		this.elements.nextButtons.forEach((nextButton) => {
+			nextButton.disabled = true;
+		});
+	}
+
+	isFirstQuestion() {
+		if(this.currentQuestionIndex === 0) {
+			return true;
+		}
+		return false;
+	}
+
+	isLastQuestion() {
+		if(this.currentQuestionIndex === parseInt(this.questionCount - 1)) {
+			return true;
+		}
+		return false;
 	}
 
 	previousButtonInit() {
@@ -43,14 +136,31 @@ class Quiz {
 		});
 	}
 
+	previousButtonDisable() {
+		this.elements = {
+			previousButtons: document.querySelectorAll('.qbank-quiz-previous-button')
+		}
+		this.elements.previousButtons.forEach((previousButton) => {
+			previousButton.disabled = true;
+		});
+	}
+
 	previousHandler(e) {
+		if(this.currentQuestionIndex < 1) {
+			console.error('Trying to handle a previous click when current question index is 0.');
+			return;
+		}
+
+		const newQuestionIndex = parseInt(this.currentQuestionIndex -1);
 
 		console.log('clicking prev...')
-		this.loadQuestion(0)
+		this.loadQuestion(newQuestionIndex)
 
 	}
 
 	loadQuestion(questionIndex) {
+
+		console.log(questionIndex)
 
 		const answerScreen = document.getElementById('qbank-quiz-answer');
 		if(answerScreen) {
@@ -61,9 +171,6 @@ class Quiz {
 		const answerTemplate        = document.getElementById('qbank-quiz-answer-template');
 		const answerTemplateContent = document.importNode(answerTemplate.content, true);
 		answerTemplate.parentNode.insertBefore(answerTemplateContent, answerTemplate.nextSibling);
-
-		console.log(questionIndex)
-		console.log(this.questionData[questionIndex].question_text)
 
 		// Load question content.
 		const questionContentContainer = document.querySelector('.qbank-question-content');
@@ -96,9 +203,59 @@ class Quiz {
 			answerButton.setAttribute('question-id', this.questionData[questionIndex].id);
 		});
 
+		// Update current question index.
+		this.currentQuestionIndex = questionIndex;
+
 		// Init quiz nav buttons.
-		this.previousButtonInit();
-		this.nextButtonInit();
+		if( this.isFirstQuestion() ) {
+			this.previousButtonDisable();
+		} else {
+			this.previousButtonInit();
+		}
+
+		if( this.isLastQuestion() ) {
+			//this.nextButtonDisable();
+			this.convertNextToFinishButton();
+		} else {
+			this.nextButtonInit();
+		}
+
+
+		// Update score display.
+		this.updateScoreDisplay();
+
+	}
+
+	convertNextToFinishButton() {
+
+		this.elements = {
+			nextButtons: document.querySelectorAll('.qbank-quiz-next-button')
+		}
+		this.elements.nextButtons.forEach((nextButton) => {
+			console.log(nextButton)
+			nextButton.addEventListener('click', this.reviewHandler.bind(this));
+			nextButton.innerHTML = 'Finish';
+		});
+
+	}
+
+	reviewHandler() {
+
+		console.log('review handler called...')
+
+		// Remove answer screen if shown.
+		const answerScreen = document.getElementById('qbank-quiz-answer');
+		if(answerScreen) {
+			answerScreen.remove();
+		}
+
+		// Inject review screen.
+		const template        = document.getElementById('qbank-quiz-review-template');
+		const templateContent = document.importNode(template.content, true);
+		template.parentNode.insertBefore(templateContent, template.nextSibling);
+
+		// Update score display.
+		this.updateScoreDisplay();
 
 	}
 
