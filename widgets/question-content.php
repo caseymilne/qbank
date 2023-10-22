@@ -160,10 +160,15 @@ class QuestionContent_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 
 		global $post;
-		$question_text = get_field( 'question_text', $post->ID );
-		if( $question_text === NULL || $question_text == '' ) {
-			$question_text = $post->post_title;
+		if(get_post_type() === 'question') {
+			$question_text = get_field( 'question_text', $post->ID );
+			if( $question_text === NULL || $question_text == '' ) {
+				$question_text = $post->post_title;
+			}
+		} else {
+			$question_text = '{{question_content}}';
 		}
+
 		$settings = $this->get_settings_for_display();
 		echo '<div class="qbank-question-content">';
 		echo $question_text;

@@ -18,9 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AnswerButton_Widget extends \Elementor\Widget_Base {
 
 	public function __construct($data = [], $args = null) {
-      parent::__construct($data, $args);
-      wp_register_script( 'qbank-answer', QBANK_URL . '/script/answer.js', [ 'elementor-frontend' ], '1.0.0', true );
-   }
+	  parent::__construct($data, $args);
+	  wp_register_script( 'qbank-answer', QBANK_URL . '/script/answer.js', [ 'elementor-frontend' ], '1.0.0', true );
+	}
+
 	/**
 	 * Get widget name.
 	 *
@@ -100,8 +101,8 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_script_depends() {
-  	return [ 'qbank-answer' ];
-   }
+		return [ 'qbank-answer' ];
+	}
 
 	/**
 	 * Register oEmbed widget controls.

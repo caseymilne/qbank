@@ -17,6 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Quiz_Widget extends \Elementor\Widget_Base {
 
+	public function __construct($data = [], $args = null) {
+	  parent::__construct($data, $args);
+	  wp_register_script( 'qbank-quiz', QBANK_URL . '/script/quiz.js', [ 'elementor-frontend' ], '1.0.0', true );
+		wp_register_script( 'qbank-answer', QBANK_URL . '/script/answer.js', [ 'elementor-frontend', 'qbank-quiz' ], '1.0.0', true );
+	}
+
 	/**
 	 * Get widget name.
 	 *
@@ -95,6 +101,11 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		return [ 'question', 'content' ];
 	}
 
+	public function get_script_depends() {
+		return [ 'qbank-quiz' ];
+		return [ 'qbank-answer' ];
+	}
+
 	/**
 	 * Register oEmbed widget controls.
 	 *
@@ -137,14 +148,32 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 	 */
 	protected function render() {
 
+		global $post;
 
 		$settings = $this->get_settings_for_display();
-		echo '<div>';
-		echo 'QUIZ WIDGET ---- ';
-		echo 'Question Template: '.$settings['question_template'];
-		echo '</div>';
 
+		$question_posts = get_field('questions', $post->ID);
+		$questions = [];
+		foreach($question_posts as $question_index => $question_post) {
+			$question = [
+				'id'              => $question_post->ID,
+				'post_title'      => $question_post->post_title,
+				'lesson'          => get_field('lesson', $question_post->ID),
+				'question_text'   => get_field('lesson', $question_post->ID),
+				'answers'         => get_field('answers', $question_post->ID),
+				'question_number' => $question_index+1,
+			];
+			$questions[] = $question;
+		}
+		echo '<script>';
+		echo 'var qbankQuestionData = ';
+		echo json_encode($questions);
+		echo ';';
+		echo '</script>';
+
+		echo '<template id="qbank-quiz-template">';
 		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['question_template'] );
+		echo '</template>';
 
 	}
 
