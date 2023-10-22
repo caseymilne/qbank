@@ -1,8 +1,9 @@
 class Quiz {
 
-	questionData         = null;
-	questionCount        = 0;
-	currentQuestionIndex = false;
+	questionData          = null;
+	questionCount         = 0;
+	currentQuestionIndex  = false;
+	currentQuestionNumber = 0;
 
 	constructor() {
 
@@ -204,7 +205,8 @@ class Quiz {
 		});
 
 		// Update current question index.
-		this.currentQuestionIndex = questionIndex;
+		this.currentQuestionIndex  = questionIndex;
+		this.currentQuestionNumber = questionIndex + 1;
 
 		// Init quiz nav buttons.
 		if( this.isFirstQuestion() ) {
@@ -220,9 +222,21 @@ class Quiz {
 			this.nextButtonInit();
 		}
 
-
 		// Update score display.
 		this.updateScoreDisplay();
+
+		// Update question number display.
+		this.updateQuestionNumberDisplay();
+
+	}
+
+	updateQuestionNumberDisplay() {
+
+		const questionNumberWidgets = document.querySelectorAll('.quiz-question-number');
+		if( !questionNumberWidgets.length ) { return; }
+		questionNumberWidgets.forEach((questionNumberWidget) => {
+			questionNumberWidget.innerHTML = questionNumberWidget.innerHTML.replace('{{quiz-question-number}}', this.currentQuestionNumber);
+		});
 
 	}
 

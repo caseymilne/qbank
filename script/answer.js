@@ -105,19 +105,16 @@ class QBANK_Answer {
 
 			// Show question lesson.
 			const lessonTemplate = document.getElementById('qbank-question-lesson-template');
-			console.log(this.lessonContent)
-			if(lessonTemplate && this.lessonContent !== null) {
 
+			if(lessonTemplate && this.lessonContent !== null) {
 				const lessonFragment = lessonTemplate.content.cloneNode(true);
 				const lessonElement  = lessonFragment.querySelector('.qbank-question-lesson');
 				const container = document.getElementById('qbank-answer-result');
-
 				if (container) {
 					console.log(lessonElement);
 					lessonElement.innerHTML = lessonElement.innerHTML.replace('{{question-lesson}}', this.lessonContent);
 			    container.appendChild(lessonElement);
 			  }
-
 			}
 
 			this.scrollToAnswerResults();

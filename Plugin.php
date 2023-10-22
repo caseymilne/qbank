@@ -81,6 +81,9 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/quiz-score-answers.php' );
 		$widgets_manager->register( new \QBank\QuizScoreAnswers_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz-question-number.php' );
+		$widgets_manager->register( new \QBank\QuizQuestionNumber_Widget() );
+
 	}
 
 }
