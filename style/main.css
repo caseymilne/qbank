@@ -15,11 +15,20 @@
 	background-color: rgb(241 245 249);
 }
 
+#qbank-answer-choice-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem; margin: 0;
+	padding: 0;
+}
+
+.qbank-answer-choice { cursor: pointer; }
+
 .qbank-answer-choice:hover {
 	background-color: rgb(226 232 240);
 }
 
-.qbank-answer-choice-list .qbank-answer-selected {
+#qbank-answer-choice-list .qbank-answer-selected {
 	background-color: rgb(203 213 225);
 }
 
@@ -34,10 +43,10 @@
 	border-right: solid 1px rgb(226 232 240);
 }
 
-.qbank-answer-choice-list .qbank-answer-correct {
+#qbank-answer-choice-list .qbank-answer-correct {
 	background-color: rgb(134 239 172);
 }
 
-.qbank-answer-choice-list .qbank-answer-incorrect {
+#qbank-answer-choice-list .qbank-answer-incorrect {
 	background-color: rgb(254 205 211);
 }

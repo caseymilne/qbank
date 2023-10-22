@@ -22,7 +22,7 @@ class Plugin {
 		add_action('wp_enqueue_scripts', function() {
 			wp_enqueue_style(
 				'qbank-main-style',
-				QBANK_URL . '/style/main.css',
+				QBANK_URL . 'style/main.css',
 				[],
 				time(),
 				'all'

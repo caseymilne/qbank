@@ -125,12 +125,32 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
-			'question_template',
+			'start_template',
 			[
-				'label' => esc_html__( 'Question Template ID', 'qbank' ),
+				'label' => esc_html__( 'Start Template ID', 'qbank' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
 				'input_type' => 'url',
-				'placeholder' => esc_html__( 'Question Template ID', 'qbank' ),
+				'placeholder' => esc_html__( 'Start Template ID', 'qbank' ),
+			]
+		);
+
+		$this->add_control(
+			'answer_template',
+			[
+				'label' => esc_html__( 'Answer Template ID', 'qbank' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'input_type' => 'url',
+				'placeholder' => esc_html__( 'Answer Template ID', 'qbank' ),
+			]
+		);
+
+		$this->add_control(
+			'review_template',
+			[
+				'label' => esc_html__( 'Review Template ID', 'qbank' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'input_type' => 'url',
+				'placeholder' => esc_html__( 'Review Template ID', 'qbank' ),
 			]
 		);
 
@@ -159,7 +179,7 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 				'id'              => $question_post->ID,
 				'post_title'      => $question_post->post_title,
 				'lesson'          => get_field('lesson', $question_post->ID),
-				'question_text'   => get_field('lesson', $question_post->ID),
+				'question_text'   => get_field('question_text', $question_post->ID),
 				'answers'         => get_field('answers', $question_post->ID),
 				'question_number' => $question_index+1,
 			];
@@ -171,8 +191,18 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		echo ';';
 		echo '</script>';
 
-		echo '<template id="qbank-quiz-template">';
-		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['question_template'] );
+		echo '<template id="qbank-quiz-start-template">';
+		echo '<div id="qbank-quiz-start">';
+		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['start_template'] );
+		echo '</div>';
+		echo '</template>';
+
+		echo '<template id="qbank-quiz-answer-template">';
+		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['answer_template'] );
+		echo '</template>';
+
+		echo '<template id="qbank-quiz-review-template">';
+		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['review_template'] );
 		echo '</template>';
 
 	}

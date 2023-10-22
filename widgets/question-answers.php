@@ -161,31 +161,43 @@ class QuestionAnswers_Widget extends \Elementor\Widget_Base {
 
 		$answer_choice_markers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'L'];
 		$settings = $this->get_settings_for_display();
-		$answers = get_field('answers');
 
-		if($answers === NULL) {
-			echo 'No answers founds.';
+
+		global $post;
+		if(get_post_type() === 'question') {
+			$answers = get_field('answers');
+			if( $answers === NULL || $answers == '' ) {
+				echo 'No answers found.';
+				return;
+			}
+			echo '<ul class="qbank-answer-choice-list">';
+			if( is_array( $answers ) ) {
+				foreach( $answers as $answer_index => $answer_row ) {
+					echo '<li answer-index="'. $answer_index .'" class="qbank-answer-choice">';
+					echo '<div class="qbank-answer-choice-marker">';
+					echo $answer_choice_markers[$answer_index];
+					echo '</div>';
+					echo '<div>';
+					echo $answer_row['text'];
+					echo '</div>';
+					echo '</li>';
+				}
+			};
+			echo '</ul>';
+			return;
 		}
 
-		echo '<ul class="qbank-answer-choice-list">';
-		if( is_array( $answers ) ) {
-			foreach( $answers as $answer_index => $answer_row ) {
-				echo '<li answer-index="'. $answer_index .'" class="qbank-answer-choice">';
-				echo '<div class="qbank-answer-choice-marker">';
-				echo $answer_choice_markers[$answer_index];
-				echo '</div>';
-				echo '<div>';
-				echo $answer_row['text'];
-				echo '</div>';
-				echo '</li>';
-			}
-		};
+		// Template on quiz page.
+		echo '<ul id="qbank-answer-choice-list">';
+		echo '<li answer-index="0" class="qbank-answer-choice">';
+		echo '<div class="qbank-answer-choice-marker">';
+		echo '{{answer_marker}}';
+		echo '</div>';
+		echo '<div>';
+		echo '{{answer_text}}';
+		echo '</div>';
+		echo '</li>';
 		echo '</ul>';
-
-		echo '<style>';
-		echo '.qbank-answer-choice-list { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; }';
-		echo '.qbank-answer-choice { cursor: pointer; }';
-		echo '</style>';
 
 	}
 
