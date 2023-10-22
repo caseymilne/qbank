@@ -68,7 +68,8 @@ class QBANK_Answer {
 	}
 
 	answerHandler(e) {
-		const questionId = e.currentTarget.getAttribute('question-id');
+		const questionId         = e.currentTarget.getAttribute('question-id');
+		const questionRevisionId = e.currentTarget.getAttribute('question-revision-id');
 
 		if( !this.selectedAnswerIndex ) {
 			console.error('No answer selected.');
@@ -76,9 +77,10 @@ class QBANK_Answer {
 		}
 
 		const answerData = {
-			question_id: questionId, // Replace with the actual question ID
-			student_id: 999,  // Replace with the actual student ID
-			answer_index: this.selectedAnswerIndex, // Include the selected choice
+			question_id: questionId,
+			question_revision_id: questionRevisionId,
+			student_id: 999,
+			answer_index: this.selectedAnswerIndex,
 		};
 
 		// Make a POST request to your custom API route

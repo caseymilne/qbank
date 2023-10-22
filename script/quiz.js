@@ -12,8 +12,21 @@ class Quiz {
 		this.questionData = qbankQuestionData;
 		this.questionCount = this.questionData.length;
 
-		this.startScreenShow();
+		// Import quiz settings.
+		this.settings = qbankQuizSettings;
+
+		// Create quiz session.
 		this.createSession();
+
+		// Init scoring object.
+		this.initScoringObject();
+
+		// Show start screen if quiz supports it.
+		if( this.settings.show_start !== false ) {
+			this.startScreenShow();
+		} else {
+			this.answerScreenShow();
+		}
 
 		// Track scoring on event.
 		document.addEventListener('qbank_question_answer_result', (e) => {
@@ -46,6 +59,36 @@ class Quiz {
 
 	}
 
+	initScoringObject() {
+		this.score = {
+			answerCount: 0,
+			correctCount: 0,
+			incorrectCount: 0,
+			percent: 0
+		}
+	}
+
+	questionCountDisplay() {
+
+		const widgets = document.querySelectorAll('.quiz-question-count-template');
+		if(widgets.length) {
+			widgets.forEach((widget) => {
+				const widgetFragment = document.importNode(widget.content, true);
+				widget.parentNode.insertBefore(widgetFragment, widget.nextSibling);
+			});
+		}
+
+		const els = document.querySelectorAll('.quiz-question-count');
+		if(els.length) {
+			els.forEach((el) => {
+				el.innerHTML = el.innerHTML.replace('{{quiz-question-count}}', this.questionCount);
+			});
+		}
+
+
+
+	}
+
 	startScreenShow() {
 		// Show quiz start page.
 		const startTemplate = document.getElementById('qbank-quiz-start-template');
@@ -58,13 +101,9 @@ class Quiz {
 		}
 		this.elements.startButton.addEventListener('click', this.startHandler.bind(this));
 
-		// Init scoring object.
-		this.score = {
-			answerCount: 0,
-			correctCount: 0,
-			incorrectCount: 0,
-			percent: 0
-		}
+		// Show question count if it exists.
+		this.questionCountDisplay();
+
 	}
 
 	updateScoreDisplay() {
@@ -237,6 +276,7 @@ class Quiz {
 		const answerButtons = document.querySelectorAll('.qbank-answer-button');
 		answerButtons.forEach((answerButton) => {
 			answerButton.setAttribute('question-id', this.questionData[questionIndex].id);
+			answerButton.setAttribute('question-revision-id', this.questionData[questionIndex].revision_id);
 		});
 
 		// Update current question index.
@@ -312,9 +352,20 @@ class Quiz {
 
 	startHandler(e) {
 
+		this.answerScreenShow();
+
+
+
+	}
+
+	answerScreenShow() {
+
 		// Remove start screen.
 		const startScreen = document.getElementById('qbank-quiz-start');
-		startScreen.remove();
+		if(startScreen) {
+			startScreen.remove();
+		}
+
 
 		// Load question.
 		this.loadQuestion(0);
@@ -328,11 +379,12 @@ class Quiz {
 
 	restartHandler(e) {
 
-		console.log('restart handler...')
-
 		// Remove review screen.
 		const screen = document.getElementById('qbank-quiz-review');
 		screen.remove();
+
+		// Init scoring object.
+		this.initScoringObject();
 
 		// Show start screen.
 		this.startScreenShow();

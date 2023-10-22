@@ -34,11 +34,7 @@ add_action( 'init', function() {
 	),
 	'public' => true,
 	'show_in_rest' => true,
-	'supports' => array(
-		0 => 'title',
-		1 => 'editor',
-		2 => 'thumbnail',
-	),
+	'supports' => array('title', 'revisions'),
 	'delete_with_user' => false,
 ) );
 
@@ -75,11 +71,7 @@ add_action( 'init', function() {
 	),
 	'public' => true,
 	'show_in_rest' => true,
-	'supports' => array(
-		0 => 'title',
-		1 => 'editor',
-		2 => 'thumbnail',
-	),
+	'supports' => array('title'),
 	'delete_with_user' => false,
 ) );
 } );

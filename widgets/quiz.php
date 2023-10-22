@@ -180,6 +180,11 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		$question_posts = get_field('questions', $post->ID);
 		$questions = [];
 		foreach($question_posts as $question_index => $question_post) {
+			$revision_id = 0;
+			$question_revision_data = wp_get_latest_revision_id_and_total_count($question_post);
+			if( is_array($question_revision_data) ) {
+				$revision_id = $question_revision_data['latest_id'];
+			}
 			$question = [
 				'id'              => $question_post->ID,
 				'post_title'      => $question_post->post_title,
@@ -187,12 +192,22 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 				'question_text'   => get_field('question_text', $question_post->ID),
 				'answers'         => get_field('answers', $question_post->ID),
 				'question_number' => $question_index+1,
+				'revision_id'     => $revision_id
 			];
 			$questions[] = $question;
 		}
 		echo '<script>';
 		echo 'var qbankQuestionData = ';
 		echo json_encode($questions);
+		echo ';';
+		echo '</script>';
+
+		// Load quiz settings from ACF Fields.
+		$quizSettings = new \stdClass;
+		$quizSettings->show_start = get_field('show_start', $post->ID);
+		echo '<script>';
+		echo 'var qbankQuizSettings = ';
+		echo json_encode($quizSettings);
 		echo ';';
 		echo '</script>';
 

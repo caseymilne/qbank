@@ -18,7 +18,7 @@ class Plugin {
 
 		require_once( QBANK_PATH . '/inc/post_types.php' );
 		require_once( QBANK_PATH . '/functions.php' );
-		
+
 		add_action( 'elementor/widgets/register', [$this, 'register_new_widgets'] );
 
 		add_action('wp_enqueue_scripts', function() {
@@ -97,6 +97,9 @@ class Plugin {
 
 		require_once( QBANK_PATH . '/widgets/student-score-percent.php' );
 		$widgets_manager->register( new \QBank\StudentScorePercent_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/quiz-question-count.php' );
+		$widgets_manager->register( new \QBank\QuizQuestionCount_Widget() );
 
 	}
 
