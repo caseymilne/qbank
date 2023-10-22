@@ -34,6 +34,22 @@ class Quiz {
 
 	}
 
+	previousButtonInit() {
+		this.elements = {
+			previousButtons: document.querySelectorAll('.qbank-quiz-previous-button')
+		}
+		this.elements.previousButtons.forEach((previousButton) => {
+			previousButton.addEventListener('click', this.previousHandler.bind(this));
+		});
+	}
+
+	previousHandler(e) {
+
+		console.log('clicking prev...')
+		this.loadQuestion(0)
+
+	}
+
 	loadQuestion(questionIndex) {
 
 		const answerScreen = document.getElementById('qbank-quiz-answer');
@@ -80,6 +96,10 @@ class Quiz {
 			answerButton.setAttribute('question-id', this.questionData[questionIndex].id);
 		});
 
+		// Init quiz nav buttons.
+		this.previousButtonInit();
+		this.nextButtonInit();
+
 	}
 
 	startHandler(e) {
@@ -88,13 +108,8 @@ class Quiz {
 		const startScreen = document.getElementById('qbank-quiz-start');
 		startScreen.remove();
 
-
-
 		// Load question.
 		this.loadQuestion(0);
-
-		// Init next buttons.
-		this.nextButtonInit();
 
 	}
 
