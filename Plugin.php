@@ -16,7 +16,9 @@ class Plugin {
 
 	public function __construct() {
 
+		require_once( QBANK_PATH . '/inc/post_types.php' );
 		require_once( QBANK_PATH . '/functions.php' );
+		
 		add_action( 'elementor/widgets/register', [$this, 'register_new_widgets'] );
 
 		add_action('wp_enqueue_scripts', function() {
@@ -54,6 +56,12 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/quiz-start-button.php' );
 		$widgets_manager->register( new \QBank\QuizStartButton_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz-restart-button.php' );
+		$widgets_manager->register( new \QBank\QuizRestartButton_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/quiz-review-button.php' );
+		$widgets_manager->register( new \QBank\QuizReviewButton_Widget() );
+
 		require_once( QBANK_PATH . '/widgets/quiz-question.php' );
 		$widgets_manager->register( new \QBank\QuizQuestion_Widget() );
 
@@ -78,11 +86,17 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/quiz-score-incorrect.php' );
 		$widgets_manager->register( new \QBank\QuizScoreIncorrect_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz-score-percent.php' );
+		$widgets_manager->register( new \QBank\QuizScorePercent_Widget() );
+
 		require_once( QBANK_PATH . '/widgets/quiz-score-answers.php' );
 		$widgets_manager->register( new \QBank\QuizScoreAnswers_Widget() );
 
 		require_once( QBANK_PATH . '/widgets/quiz-question-number.php' );
 		$widgets_manager->register( new \QBank\QuizQuestionNumber_Widget() );
+
+		require_once( QBANK_PATH . '/widgets/student-score-percent.php' );
+		$widgets_manager->register( new \QBank\StudentScorePercent_Widget() );
 
 	}
 

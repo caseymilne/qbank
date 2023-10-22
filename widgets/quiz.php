@@ -18,9 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Quiz_Widget extends \Elementor\Widget_Base {
 
 	public function __construct($data = [], $args = null) {
+		global $post;
 	  parent::__construct($data, $args);
 	  wp_register_script( 'qbank-quiz', QBANK_URL . '/script/quiz.js', [ 'elementor-frontend' ], '1.0.0', true );
 		wp_register_script( 'qbank-answer', QBANK_URL . '/script/answer.js', [ 'elementor-frontend', 'qbank-quiz' ], '1.0.0', true );
+		wp_localize_script( 'qbank-answer', 'qbankQuizData', array(
+      'nonce'  => wp_create_nonce('wp_rest'),
+			'quizId' => $post->ID
+    ));
 	}
 
 	/**
@@ -204,7 +209,9 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		echo '</template>';
 
 		echo '<template id="qbank-quiz-review-template">';
+		echo '<div id="qbank-quiz-review">';
 		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['review_template'] );
+		echo '</div>';
 		echo '</template>';
 
 	}

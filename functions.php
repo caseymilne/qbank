@@ -12,6 +12,46 @@ function register_qbank_api_routes() {
       'student_id' => array(),
     ),
   ));
+
+	register_rest_route('qbank/v1', '/session', array(
+    'methods' => 'POST',
+    'callback' => 'qbank_session_create_callback',
+    'args' => array(),
+  ));
+}
+
+function qbank_session_create_callback($request) {
+
+	$quiz_id_sent = $request->get_param('quiz_id');
+	if( $quiz_id_sent ) {
+		$quiz_id = $quiz_id_sent;
+	} else {
+		$quiz_id = 0;
+	}
+
+	$user_id = get_current_user_id();
+	if ( $user_id === 0 ) {
+    return rest_ensure_response(array(
+      'error' => 'Invalid user, or user not logged in.'
+    ));
+  }
+
+	$session_data = array(
+		'user_id' => $user_id,
+		'quiz_id' => $quiz_id
+	);
+	$result = qbank_create_session($session_data);
+	if ($result !== false) {
+		return rest_ensure_response(array(
+	    'success' => true
+	  ));
+	} else {
+		return rest_ensure_response(array(
+			'success' => false,
+	    'error'   => 'Student session saved.'
+	  ));
+	}
+
 }
 
 function save_answer_to_question($request) {
@@ -131,4 +171,64 @@ function answer_correct_index($question_id) {
 
 	return false;
 
+}
+
+/**
+ *
+ * QBank Create Session.
+ *
+ * Example Usage:
+ *
+ * This code demonstrates how to use the qbank_create_session function to insert a new session
+ * into the wp_qbank_session table.
+ *
+ * Usage:
+ *
+		 $session_data = array(
+			 'user_id' => 123,
+			 'quiz_id' => 456,
+			 'start' => '2023-10-21 09:00:00',
+			 'end' => '2023-10-21 10:00:00',
+		 );
+		 $result = qbank_create_session($session_data);
+		 if ($result !== false) {
+		 	// Data inserted successfully, and $result contains the inserted row's ID
+		 } else {
+			 Failed to insert data
+		 }
+ *
+ * @param array $session_data An array containing session data, including user_id, quiz_id, start, and end.
+ *
+ * @return int|false The ID of the inserted row on success, or false on failure.
+ */
+
+function qbank_create_session($session_data) {
+
+  global $wpdb;
+
+    // Define the table name
+    $table_name = $wpdb->prefix . 'qbank_session';
+
+    // Extract data from the session_data array
+    $user_id = $session_data['user_id'];
+    $quiz_id = $session_data['quiz_id'];
+
+    // Prepare the data for insertion
+    $data = array(
+        'user_id' => $user_id,
+        'quiz_id' => $quiz_id
+    );
+
+    // Define the data format for the prepared statement
+    $data_format = array('%d', '%d', '%s', '%s');
+
+    // Insert the data into the database table
+    $wpdb->insert($table_name, $data, $data_format);
+
+    // Check for errors and return the result
+    if ($wpdb->last_error) {
+        return false; // Failed to insert data
+    } else {
+        return $wpdb->insert_id; // Returns the ID of the inserted row
+    }
 }

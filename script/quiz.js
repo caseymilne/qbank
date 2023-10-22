@@ -4,6 +4,7 @@ class Quiz {
 	questionCount         = 0;
 	currentQuestionIndex  = false;
 	currentQuestionNumber = 0;
+	questionsAnswered     = [];
 
 	constructor() {
 
@@ -11,6 +12,41 @@ class Quiz {
 		this.questionData = qbankQuestionData;
 		this.questionCount = this.questionData.length;
 
+		this.startScreenShow();
+		this.createSession();
+
+		// Track scoring on event.
+		document.addEventListener('qbank_question_answer_result', (e) => {
+
+			// Update score storage.
+			this.score.answerCount++;
+
+			const correct = e.detail.correct;
+			if(correct) {
+				this.score.correctCount++;
+			}
+			if(!correct) {
+				this.score.incorrectCount++;
+			}
+
+			// Update percentage (in progress, running).
+			if(this.score.answerCount > 0 && this.score.correctCount > 0) {
+				this.score.percent = Math.round( ( this.score.correctCount / this.score.answerCount ) * 100 );
+			} else {
+				this.score.percent = 0;
+			}
+
+			// Update score display.
+			this.updateScoreDisplay();
+
+			// Add current question to the questionsAnswered array.
+			this.questionsAnswered.push(this.currentQuestionIndex);
+
+		});
+
+	}
+
+	startScreenShow() {
 		// Show quiz start page.
 		const startTemplate = document.getElementById('qbank-quiz-start-template');
 		const startTemplateContent  = document.importNode(startTemplate.content, true);
@@ -26,31 +62,9 @@ class Quiz {
 		this.score = {
 			answerCount: 0,
 			correctCount: 0,
-			incorrectCount: 0
+			incorrectCount: 0,
+			percent: 0
 		}
-
-		// Track scoring on event.
-		document.addEventListener('qbank_question_answer_result', (e) => {
-			console.log(this.score)
-
-			// Update score storage.
-			this.score.answerCount++;
-
-			const correct = e.detail.correct;
-			if(correct) {
-				this.score.correctCount++;
-			}
-			if(!correct) {
-				this.score.incorrectCount++;
-			}
-
-			console.log(this.score)
-
-			// Update score display.
-			this.updateScoreDisplay();
-
-		});
-
 	}
 
 	updateScoreDisplay() {
@@ -79,9 +93,19 @@ class Quiz {
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-correct}}', this.score.correctCount);
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-incorrect}}', this.score.incorrectCount);
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-answers}}', this.score.answerCount);
+				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-percent}}', this.score.percent);
 			});
 		}
 
+	}
+
+	reviewButtonInit() {
+		this.elements = {
+			reviewButtons: document.querySelectorAll('.qbank-quiz-review-button')
+		}
+		this.elements.reviewButtons.forEach((reviewButton) => {
+			reviewButton.addEventListener('click', this.reviewHandler.bind(this));
+		});
 	}
 
 	nextButtonInit() {
@@ -153,15 +177,21 @@ class Quiz {
 		}
 
 		const newQuestionIndex = parseInt(this.currentQuestionIndex -1);
-
-		console.log('clicking prev...')
 		this.loadQuestion(newQuestionIndex)
 
 	}
 
+	isQuestionAnswered(questionIndex) {
+		if (this.questionsAnswered.includes(questionIndex)) {
+		  return true;
+		}
+		return false;
+	}
+
 	loadQuestion(questionIndex) {
 
-		console.log(questionIndex)
+		// Check if question being loaded has already been answered.
+		const questionAnswered = this.isQuestionAnswered(questionIndex);
 
 		const answerScreen = document.getElementById('qbank-quiz-answer');
 		if(answerScreen) {
@@ -194,8 +224,13 @@ class Quiz {
 
 		// Attach answer selection events.
 		const $_answer = new QBANK_Answer();
-		$_answer.attachAnswerChoiceEvents();
-		$_answer.attachAnswerButtonEvents();
+
+		// Attach answer events only if question not already answered.
+		if( ! questionAnswered ) {
+			$_answer.attachAnswerChoiceEvents();
+			$_answer.attachAnswerButtonEvents();
+		}
+
 		$_answer.setAnswerLesson(this.questionData[questionIndex].lesson);
 
 		// Update question ID in answer button.
@@ -222,6 +257,8 @@ class Quiz {
 			this.nextButtonInit();
 		}
 
+		this.reviewButtonInit();
+
 		// Update score display.
 		this.updateScoreDisplay();
 
@@ -246,7 +283,6 @@ class Quiz {
 			nextButtons: document.querySelectorAll('.qbank-quiz-next-button')
 		}
 		this.elements.nextButtons.forEach((nextButton) => {
-			console.log(nextButton)
 			nextButton.addEventListener('click', this.reviewHandler.bind(this));
 			nextButton.innerHTML = 'Finish';
 		});
@@ -254,8 +290,6 @@ class Quiz {
 	}
 
 	reviewHandler() {
-
-		console.log('review handler called...')
 
 		// Remove answer screen if shown.
 		const answerScreen = document.getElementById('qbank-quiz-answer');
@@ -271,6 +305,9 @@ class Quiz {
 		// Update score display.
 		this.updateScoreDisplay();
 
+		// Init restart button if it exists.
+		this.restartButtonInit();
+
 	}
 
 	startHandler(e) {
@@ -284,6 +321,24 @@ class Quiz {
 
 	}
 
+	restartButtonInit() {
+		const buttons = document.querySelector('.qbank-quiz-restart-button')
+		buttons.addEventListener('click', this.restartHandler.bind(this));
+	}
+
+	restartHandler(e) {
+
+		console.log('restart handler...')
+
+		// Remove review screen.
+		const screen = document.getElementById('qbank-quiz-review');
+		screen.remove();
+
+		// Show start screen.
+		this.startScreenShow();
+
+	}
+
 	// Create a function to clone and modify the template
 	createLiFromTemplate(templateLi, answer) {
 	  const listItem = templateLi.cloneNode(false);
@@ -293,6 +348,33 @@ class Quiz {
 	    .replace('{{answer_text}}', answer.text);
 		listItem.setAttribute('answer-index', answer.index)
 	  return listItem;
+	}
+
+	createSession() {
+
+		const requestData = {
+			quiz_id: qbankQuizData.quizId
+		}
+
+		fetch('/wp-json/qbank/v1/session', {
+			method: 'POST',
+			headers: {
+	      'Content-Type': 'application/json',
+	      'X-WP-Nonce': qbankQuizData.nonce,
+	    },
+			body: JSON.stringify(requestData),
+		})
+		.then(response => response.json())
+		.then(data => {
+
+			console.log(data)
+
+
+		})
+		.catch(error => {
+				console.error('Error:', error);
+		});
+
 	}
 
 }
