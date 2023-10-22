@@ -159,12 +159,24 @@ class QuestionLesson_Widget extends \Elementor\Widget_Base {
 	 */
 	protected function render() {
 
+
 		global $post;
-		$question_lesson = get_field( 'lesson', $post->ID );
-		$settings = $this->get_settings_for_display();
+		if(get_post_type() === 'question') {
+			$question_lesson = get_field( 'lesson', $post->ID );
+			if( $question_lesson === NULL || $question_lesson == '' ) {
+				return;
+			}
+			echo '<template id="qbank-question-lesson-template">';
+			echo '<div class="qbank-question-lesson">';
+			echo $question_lesson;
+			echo '</div>';
+			echo '</template>';
+			return;
+		}
+
 		echo '<template id="qbank-question-lesson-template">';
 		echo '<div class="qbank-question-lesson">';
-		echo $question_lesson;
+		echo '{{question-lesson}}';
 		echo '</div>';
 		echo '</template>';
 

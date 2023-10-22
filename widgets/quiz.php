@@ -198,7 +198,9 @@ class Quiz_Widget extends \Elementor\Widget_Base {
 		echo '</template>';
 
 		echo '<template id="qbank-quiz-answer-template">';
+		echo '<div id="qbank-quiz-answer">';
 		echo \ElementorPro\Plugin::elementor()->frontend->get_builder_content_for_display( $settings['answer_template'] );
+		echo '</div>';
 		echo '</template>';
 
 		echo '<template id="qbank-quiz-review-template">';
