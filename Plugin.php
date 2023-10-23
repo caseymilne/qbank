@@ -98,6 +98,9 @@ class Plugin {
 		require_once( QBANK_PATH . '/widgets/student-score-percent.php' );
 		$widgets_manager->register( new \QBank\StudentScorePercent_Widget() );
 
+		require_once( QBANK_PATH . '/widgets/quiz-score-total.php' );
+		$widgets_manager->register( new \QBank\QuizScoreTotal_Widget() );
+
 		require_once( QBANK_PATH . '/widgets/quiz-question-count.php' );
 		$widgets_manager->register( new \QBank\QuizQuestionCount_Widget() );
 

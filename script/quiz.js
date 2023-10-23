@@ -50,6 +50,13 @@ class Quiz {
 				this.score.percent = 0;
 			}
 
+			// Update total (correct out of total questions).
+			if(this.score.correctCount > 0) {
+				this.score.total = Math.round( ( this.score.correctCount / this.questionCount ) * 100 );
+			} else {
+				this.score.total = 0;
+			}
+
 			// Update score display.
 			this.updateScoreDisplay();
 
@@ -138,6 +145,7 @@ class Quiz {
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-incorrect}}', this.score.incorrectCount);
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-answers}}', this.score.answerCount);
 				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-percent}}', this.score.percent);
+				scoreElement.innerHTML = scoreElement.innerHTML.replace('{{quiz-score-total}}', this.score.total);
 			});
 		}
 
