@@ -4,13 +4,9 @@
 
 // API routes
 function register_qbank_api_routes() {
-  register_rest_route('qbank/v1', '/save-answer/(?P<question_id>\d+)/(?P<student_id>\d+)', array(
+  register_rest_route('qbank/v1', '/save-answer', array(
     'methods' => 'POST',
-    'callback' => 'save_answer_to_question',
-    'args' => array(
-      'question_id' => array(),
-      'student_id' => array(),
-    ),
+    'callback' => 'save_answer_to_question'
   ));
 
 	register_rest_route('qbank/v1', '/session', array(
@@ -56,22 +52,17 @@ function qbank_session_create_callback($request) {
 
 function save_answer_to_question($request) {
 
-  $question_id = $request->get_param('question_id');
-  $student_id = $request->get_param('student_id');
+  // Parse JSON params.
+  $answer_data  = $request->get_json_params();
+	$question_id  = $answer_data['question_id'];
+	$answer_index = (int) $answer_data['answer_index'];
+	$question_revision_id = $answer_data['question_revision_id'];
 
-
-  // Assuming the request contains JSON data with 'answer' field
-  $answer_data = $request->get_json_params();
-
-  if (empty($answer_data) || !isset($answer_data['answer_index'])) {
+  if (empty($answer_data) || ! isset($answer_index)) {
     return rest_ensure_response(array(
       'error' => 'Invalid data. Please provide an "answer" field in the request.'
     ));
   }
-
-	$question_revision_id = $answer_data['question_revision_id'];
-
-  $answer_index = (int) $answer_data['answer_index'];
 
 	// Get the correct answer index.
 	$answer_correct_index = answer_correct_index($question_id);
@@ -82,7 +73,7 @@ function save_answer_to_question($request) {
 
   // Create an object to pass to the qbank_answer_create function
   $answer_object = (object) array(
-    'user'              => $student_id,
+    'user'              => get_current_user_id(),
     'question'          => $question_id,
 		'question_revision' => $question_revision_id,
     'answer_index'      => $answer_index,
