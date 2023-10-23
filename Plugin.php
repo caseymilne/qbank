@@ -103,6 +103,58 @@ class Plugin {
 
 	}
 
+	public static function activate() {
+
+		// Check if Elementor is active
+    if (!class_exists('Elementor\Plugin')) {
+      return;
+    }
+
+		self::import_templates();
+
+	}
+
+	public static function import_templates() {
+
+		error_log('running import templates...');
+
+    // Create an instance of Elementor TemplateLibrary Manager
+    $template_manager = new \Elementor\TemplateLibrary\Manager();
+
+		// Define the path to your templates directory
+		$templates_dir = QBANK_PATH . '/templates/';
+
+		// Get a list of template files in the directory
+		$template_files = glob($templates_dir . '*.json');
+
+    // Check if the manager exists
+    if (method_exists($template_manager, 'instance')) {
+
+			// Import each template
+	    foreach ($template_files as $template_file) {
+        $template_data = file_get_contents($template_file);
+        if ($template_data) {
+          // Import the template into Elementor
+          $import_result = $template_manager->instance()->import_template([
+            'source' => 'local',
+            'data' => $template_data,
+          ]);
+          // Check $import_result for success or error handling
+					error_log(print_r($import_result, 1));
+        }
+	    }
+
+	  } else {
+			error_log('Instance method does not exist in template manager.');
+		}
+
+	}
+
+
+
 }
 
 new Plugin();
+
+// Register activation hook.
+register_activation_hook(__FILE__, ['\QBank\Plugin', 'activate']);

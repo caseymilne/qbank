@@ -94,45 +94,22 @@ class QBANK_Answer {
 		.then(response => response.json())
 		.then(data => {
 
-			const answerResultContainer = document.getElementById('qbank-answer-result');
+
 
 			this.answerResultEvent(data);
 
-			// Show question result.
-			if(data.answer_correct) {
-				answerResultContainer.innerHTML = 'CORRECT!';
-			} else {
-				answerResultContainer.innerHTML = 'INCORRECT!';
-			}
+			this.showQuestionResult(data.answer_correct);
 
-			// Show question lesson.
-			const lessonTemplate = document.getElementById('qbank-question-lesson-template');
-
-			if(lessonTemplate && this.lessonContent !== null) {
-				const lessonFragment = lessonTemplate.content.cloneNode(true);
-				const lessonElement  = lessonFragment.querySelector('.qbank-question-lesson');
-				const container = document.getElementById('qbank-answer-result');
-				if (container) {
-					console.log(lessonElement);
-					lessonElement.innerHTML = lessonElement.innerHTML.replace('{{question-lesson}}', this.lessonContent);
-			    container.appendChild(lessonElement);
-			  }
-			}
+			this.showLessonQuestion();
 
 			this.scrollToAnswerResults();
 
 			// Highlight correct answer.
-			const answerList = document.getElementById("qbank-answer-choice-list");
-			const answerItems = answerList.getElementsByTagName("li");
+			this.highlightCorrectAnswer(data.answer_correct_index);
 
-			answerItems[data.answer_correct_index].classList.remove("qbank-answer-selected");
-			answerItems[data.answer_correct_index].classList.add("qbank-answer-correct");
 
 			// Highlight incorrect answer if provided.
-			if( ! data.answer_correct ) {
-				answerItems[data.answer_index].classList.remove("qbank-answer-selected");
-				answerItems[data.answer_index].classList.add("qbank-answer-incorrect");
-			}
+			this.highlightIncorrectAnswer(data.answer_correct, data.answer_index);
 
 			// Lock the question to prevent further answering.
 			this.lockQuestion();
@@ -142,6 +119,47 @@ class QBANK_Answer {
 		.catch(error => {
 				console.error('Error:', error);
 		});
+	}
+
+	highlightCorrectAnswer(correctAnswerIndex) {
+		const answerList = document.getElementById("qbank-answer-choice-list");
+		const answerItems = answerList.getElementsByTagName("li");
+		answerItems[correctAnswerIndex].classList.remove("qbank-answer-selected");
+		answerItems[correctAnswerIndex].classList.add("qbank-answer-correct");
+	}
+
+	highlightIncorrectAnswer(isCorrect, answerIndex) {
+		if(isCorrect) { return; }
+		const answerList = document.getElementById("qbank-answer-choice-list");
+		const answerItems = answerList.getElementsByTagName("li");
+		answerItems[answerIndex].classList.remove("qbank-answer-selected");
+		answerItems[answerIndex].classList.add("qbank-answer-incorrect");
+	}
+
+	showQuestionResult(answerCorrect) {
+		// Show question result.
+		const answerResultContainer = document.getElementById('qbank-answer-result');
+		if(answerCorrect) {
+			answerResultContainer.innerHTML = 'CORRECT!';
+		} else {
+			answerResultContainer.innerHTML = 'INCORRECT!';
+		}
+	}
+
+	showLessonQuestion() {
+		// Show question lesson.
+		const lessonTemplate = document.getElementById('qbank-question-lesson-template');
+
+		if(lessonTemplate && this.lessonContent !== null) {
+			const lessonFragment = lessonTemplate.content.cloneNode(true);
+			const lessonElement  = lessonFragment.querySelector('.qbank-question-lesson');
+			const container = document.getElementById('qbank-answer-result');
+			if (container) {
+				console.log(lessonElement);
+				lessonElement.innerHTML = lessonElement.innerHTML.replace('{{question-lesson}}', this.lessonContent);
+				container.appendChild(lessonElement);
+			}
+		}
 	}
 
 	scrollToAnswerResults() {
@@ -162,13 +180,11 @@ class QBANK_Answer {
 
 	answerResultEvent(data) {
 
-		const eventDetails = {
-		  questionId: 123,
-		  correct: data.answer_correct,
-		};
+		console.log('answer result event data:')
+		console.log(data)
 
 		const customEvent = new CustomEvent('qbank_question_answer_result', {
-		  detail: eventDetails
+		  detail: data
 		});
 
 		document.dispatchEvent(customEvent);

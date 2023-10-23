@@ -5,6 +5,7 @@ class Quiz {
 	currentQuestionIndex  = false;
 	currentQuestionNumber = 0;
 	questionsAnswered     = [];
+	answerRecords         = {};
 
 	constructor() {
 
@@ -34,7 +35,7 @@ class Quiz {
 			// Update score storage.
 			this.score.answerCount++;
 
-			const correct = e.detail.correct;
+			const correct = e.detail.answer_correct;
 			if(correct) {
 				this.score.correctCount++;
 			}
@@ -54,6 +55,10 @@ class Quiz {
 
 			// Add current question to the questionsAnswered array.
 			this.questionsAnswered.push(this.currentQuestionIndex);
+
+			// Add current question answer result to answerRecords.
+			this.answerRecords[this.currentQuestionIndex] = e.detail;
+			console.log(this.answerRecords)
 
 		});
 
@@ -263,14 +268,19 @@ class Quiz {
 
 		// Attach answer selection events.
 		const $_answer = new QBANK_Answer();
+		$_answer.setAnswerLesson(this.questionData[questionIndex].lesson);
 
 		// Attach answer events only if question not already answered.
 		if( ! questionAnswered ) {
 			$_answer.attachAnswerChoiceEvents();
 			$_answer.attachAnswerButtonEvents();
+		} else {
+			const answerRecord = this.answerRecords[questionIndex];
+			$_answer.showQuestionResult(answerRecord.answer_correct);
+			$_answer.showLessonQuestion();
+			$_answer.highlightCorrectAnswer(answerRecord.answer_correct_index);
+			$_answer.highlightIncorrectAnswer(answerRecord.answer_correct, answerRecord.answer_index);
 		}
-
-		$_answer.setAnswerLesson(this.questionData[questionIndex].lesson);
 
 		// Update question ID in answer button.
 		const answerButtons = document.querySelectorAll('.qbank-answer-button');

@@ -175,7 +175,7 @@ class AnswerButton_Widget extends \Elementor\Widget_Base {
 		echo 'Answer';
 		echo '</button>';
 		echo '</div>';
-		echo '<div id="qbank-answer-result"><div>';
+		echo '<div id="qbank-answer-result"></div>';
 
 	}
 
