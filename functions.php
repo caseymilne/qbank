@@ -14,9 +14,20 @@ function register_qbank_api_routes() {
     'callback' => 'qbank_session_create_callback',
     'args' => array(),
   ));
+
+	register_rest_route('qbank/v1', '/session/end', array(
+    'methods' => 'POST',
+    'callback' => 'qbank_session_end_callback',
+    'args' => array(),
+  ));
 }
 
 function qbank_session_create_callback($request) {
+
+	/*
+		@TODO check if user has open session, if they do, close it.
+
+	*/
 
 	$quiz_id_sent = $request->get_param('quiz_id');
 	if( $quiz_id_sent ) {
@@ -47,6 +58,24 @@ function qbank_session_create_callback($request) {
 	    'error'   => 'Student session saved.'
 	  ));
 	}
+
+}
+
+function qbank_session_end_callback($request) {
+
+	$session_id = $request->get_param('session_id');
+	$user_id = get_current_user_id();
+
+	/*
+	 @TODO
+			fetch existing session to check that it exists.
+			update session row with the current timestamp in datetime format.
+			send response confirming session ended.
+		*/
+
+	return rest_ensure_response(array(
+		'message' => 'Session ended.',
+	));
 
 }
 

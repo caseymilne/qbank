@@ -17,6 +17,7 @@ class Plugin {
 	public function __construct() {
 
 		require_once( QBANK_PATH . '/inc/post_types.php' );
+		require_once( QBANK_PATH . '/inc/acf_fields.php' );
 		require_once( QBANK_PATH . '/functions.php' );
 
 		add_action( 'elementor/widgets/register', [$this, 'register_new_widgets'] );
