@@ -76,7 +76,8 @@ class Quiz {
 			answerCount: 0,
 			correctCount: 0,
 			incorrectCount: 0,
-			percent: 0
+			percent: 0,
+			total: 0
 		}
 	}
 
@@ -403,6 +404,12 @@ class Quiz {
 
 		// Init scoring object.
 		this.initScoringObject();
+
+		// Do quiz data resets.
+		this.currentQuestionIndex  = false;
+		this.currentQuestionNumber = 0;
+		this.questionsAnswered     = [];
+		this.answerRecords         = {};
 
 		// Show start screen.
 		this.startScreenShow();
